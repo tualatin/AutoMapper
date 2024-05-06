@@ -1,3 +1,5 @@
+using System;
+
 namespace AutoMapper;
 /// <summary>
 /// Mapping configuration options for non-generic maps
@@ -22,6 +24,13 @@ public interface IMappingExpression : IMappingExpressionBase<object, object, IMa
     /// </summary>
     /// <param name="memberOptions">Callback for member options</param>
     void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions);
+
+    /// <summary>
+    /// Customize configuration for members not previously configured
+    /// </summary>
+    /// <param name="memberOptions">Callback for member options</param>
+    void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
+
     /// <summary>
     /// Customize individual members
     /// </summary>
@@ -67,6 +76,13 @@ public interface IMappingExpression<TSource, TDestination> : IMappingExpressionB
     /// </summary>
     /// <param name="memberOptions">Callback for member options</param>
     void ForAllMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
+
+    /// <summary>
+    /// Customize configuration for members not previously configured
+    /// </summary>
+    /// <param name="memberOptions">Callback for member options</param>
+    void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
+
     /// <summary>
     /// Include this configuration in derived types' maps
     /// </summary>

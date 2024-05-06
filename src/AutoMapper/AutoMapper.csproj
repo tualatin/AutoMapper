@@ -22,7 +22,6 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
     <BaselineAllAPICompatError>true</BaselineAllAPICompatError>
     <AdditionalApiCompatOptions>--exclude-non-browsable --exclude-compiler-generated</AdditionalApiCompatOptions>
@@ -40,14 +39,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.DotNet.ApiCompat" Version="7.0.0-beta.22074.1" PrivateAssets="All" />  
   </ItemGroup>
 
-  <Target Name="PreBuild" AfterTargets="GetAssemblyVersion">
-    <Exec Condition=" '$(OS)' == 'Windows_NT' " Command="powershell -ExecutionPolicy Unrestricted -File &quot;$(ProjectDir)ApiCompat\PreBuild.ps1&quot; -version $(Version)" />
-    <Exec Condition=" '$(OS)' != 'Windows_NT' " Command="&quot;$(ProjectDir)ApiCompat/PreBuild.sh&quot; $(Version)" />
-  </Target>
   <ItemGroup>
     <Using Include="System.Linq.Expressions.Expression" Static="true" />
     <Using Include="AutoMapper.Execution.ExpressionBuilder" Static="true" />

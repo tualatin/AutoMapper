@@ -31,7 +31,7 @@ public sealed class ResolutionContext : IInternalRuntimeMapper
             {
                 ThrowInvalidMap();
             }
-            return _options.Items;
+            return _options?.Items;
         }
     }
     /// <summary>
@@ -51,7 +51,7 @@ public sealed class ResolutionContext : IInternalRuntimeMapper
         get
         {
             CheckDefault();
-            return _instanceCache ??= new();
+            return _instanceCache ??= [];
         }
     }
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class ResolutionContext : IInternalRuntimeMapper
         get
         {
             CheckDefault();
-            return _typeDepth ??= new();
+            return _typeDepth ??= new Dictionary<TypePair, int>();
         }
     }
     TDestination IMapperBase.Map<TDestination>(object source) => ((IMapperBase)this).Map(source, default(TDestination));

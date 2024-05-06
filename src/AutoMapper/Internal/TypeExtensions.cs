@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Dynamic;
 namespace AutoMapper.Internal;
+
 public static class TypeExtensions
 {
     public const BindingFlags InstanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
@@ -8,8 +9,9 @@ public static class TypeExtensions
 
     public static MethodInfo StaticGenericMethod(this Type type, string methodName, int parametersCount)
     {
-        foreach (MethodInfo foundMethod in type.GetMember(methodName, MemberTypes.Method, StaticFlags & ~BindingFlags.NonPublic))
+        foreach (var memberInfo in type.GetMember(methodName, MemberTypes.Method, StaticFlags & ~BindingFlags.NonPublic))
         {
+            var foundMethod = (MethodInfo)memberInfo;
             if (foundMethod.IsGenericMethodDefinition && foundMethod.GetParameters().Length == parametersCount)
             {
                 return foundMethod;
@@ -20,7 +22,7 @@ public static class TypeExtensions
 
     public static void CheckIsDerivedFrom(this Type derivedType, Type baseType)
     {
-        if (!baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
+        if (derivedType != null && !baseType.IsAssignableFrom(derivedType) && !derivedType.IsGenericTypeDefinition && !baseType.IsGenericTypeDefinition)
         {
             throw new ArgumentOutOfRangeException(nameof(derivedType), $"{derivedType} is not derived from {baseType}.");
         }
@@ -41,14 +43,26 @@ public static class TypeExtensions
         }
     }
 
+    public static bool IsDictionaryType(this Type type) => type.GetDictionaryType() != null;
+
+    public static bool IsEnumerableType(this Type type) => typeof(IEnumerable).IsAssignableFrom(type);
+
+
+    public static Type GetDictionaryType(this Type type) => type.GetGenericInterface(typeof(IDictionary<,>));
+
     public static PropertyInfo GetInheritedProperty(this Type type, string name) => type.GetProperty(name, InstanceFlags) ?? type.GetBaseProperty(name);
+
     static PropertyInfo GetBaseProperty(this Type type, string name) =>
         type.BaseClassesAndInterfaces().Select(t => t.GetProperty(name, InstanceFlags)).FirstOrDefault(p => p != null);
+
     public static FieldInfo GetInheritedField(this Type type, string name) => type.GetField(name, InstanceFlags) ?? type.GetBaseField(name);
+
     static FieldInfo GetBaseField(this Type type, string name) =>
         type.BaseClassesAndInterfaces().Select(t => t.GetField(name, InstanceFlags)).FirstOrDefault(f => f != null);
-    public static MethodInfo GetInheritedMethod(this Type type, string name) => type.GetInstanceMethod(name) ?? type.GetBaseMethod(name) ?? 
+
+    public static MethodInfo GetInheritedMethod(this Type type, string name) => type.GetInstanceMethod(name) ?? type.GetBaseMethod(name) ??
         throw new ArgumentOutOfRangeException(nameof(name), $"Cannot find member {name} of type {type}.");
+
     static MethodInfo GetBaseMethod(this Type type, string name) =>
         type.BaseClassesAndInterfaces().Select(t => t.GetInstanceMethod(name)).FirstOrDefault(m => m != null);
 
@@ -99,6 +113,7 @@ public static class TypeExtensions
     }
 
     public static MethodInfo GetStaticMethod(this Type type, string name) => type.GetMethod(name, StaticFlags);
+
     public static MethodInfo GetInstanceMethod(this Type type, string name) =>
         (MethodInfo)type.GetMember(name, MemberTypes.Method, InstanceFlags).FirstOrDefault();
 }
